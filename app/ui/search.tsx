@@ -8,12 +8,9 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-  
-  function handleSearch(term: string) {
-    const handleSearch = useDebouncedCallback((term) => {
-    console.log(`Searching... ${term}`);
+
+  const debouncedSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
-    console.log(term);
     params.set('page', '1');
 
     if (term) {
@@ -21,11 +18,14 @@ export default function Search({ placeholder }: { placeholder: string }) {
     } else {
       params.delete('query');
     }
-    replace(`${pathname}?${params.toString()}`);
 
-    }, 300);
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
+
+  function handleSearch(term: string) {
+    debouncedSearch(term);
   }
-  
+
   return (
     <div className="relative flex flex-1 flex-shrink-0">
       <label htmlFor="search" className="sr-only">

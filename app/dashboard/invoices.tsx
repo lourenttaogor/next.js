@@ -1,3 +1,5 @@
-export default function Page() {
-  return <p>Invoices Page</p>;
+import InvoicesPage from '@/app/ui/invoices/page';
+
+export default async function Page({ searchParams }: { searchParams?: { query?: string; page?: string } }) {
+  return <InvoicesPage searchParams={searchParams} />;
 }
