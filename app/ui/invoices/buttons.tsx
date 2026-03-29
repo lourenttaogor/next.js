@@ -27,7 +27,7 @@ export function UpdateInvoice({ id }: { id: string }) {
 
 export function DeleteInvoice({ id }: { id: string }) {
   return (
-    <form action={deleteInvoice} method="post" className="inline-block">
+    <form action={deleteInvoice} className="inline-block">
       <input type="hidden" name="id" value={id} />
       <button
         type="submit"
