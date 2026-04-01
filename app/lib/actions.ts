@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import postgres from 'postgres';
 import { redirect } from 'next/navigation';
 
@@ -67,4 +68,41 @@ export async function deleteInvoice(formData: FormData) {
 
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
+}
+
+export async function authenticate(email: string, password: string) {
+    try {
+        // Demo credentials validation
+        if (email === 'user@nextmail.com' && password === '123456') {
+            const cookieStore = await cookies();
+            // Set secure session cookie
+            cookieStore.set('session', JSON.stringify({
+                email,
+                name: 'User',
+                authenticated: true
+            }), {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+            });
+            return { success: true };
+        } else {
+            return {
+                success: false,
+                error: 'Invalid email or password. Use user@nextmail.com / 123456'
+            };
+        }
+    } catch (error) {
+        return {
+            success: false,
+            error: 'An error occurred. Please try again.'
+        };
+    }
+}
+
+export async function logout() {
+    const cookieStore = await cookies();
+    cookieStore.delete('session');
+    redirect('/login');
 }

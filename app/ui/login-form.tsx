@@ -10,12 +10,15 @@ import {
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
 import Link from 'next/link';
+import { authenticate } from '@/app/lib/actions';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,14 +26,13 @@ export default function LoginForm() {
     setIsPending(true);
 
     try {
-      // Demo: Accept the demo credentials
-      if (email === 'user@nextmail.com' && password === '123456') {
-        // Store in localStorage to simulate being logged in
-        localStorage.setItem('user', JSON.stringify({ email, name: 'User' }));
-        // Redirect to dashboard
-        window.location.href = '/dashboard';
+      const result = await authenticate(email, password);
+
+      if (result.success) {
+        // Redirect to dashboard on successful login
+        router.push('/dashboard');
       } else {
-        setErrorMessage('Invalid email or password. Use user@nextmail.com / 123456');
+        setErrorMessage(result.error || 'Invalid credentials');
       }
     } catch (err) {
       setErrorMessage('An error occurred. Please try again.');
